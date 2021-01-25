@@ -3,7 +3,7 @@ from .models import Task, Person
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .serializers import TaskSerializer
+from .serializers import TaskSerializer, PersonSerializer
 
 
 @api_view(['GET'])
@@ -18,6 +18,7 @@ def api_overview(request):
     return Response(api_urls)
 
 
+# views for tasks
 @api_view(['GET'])
 def tasks_list(request):
     tasks = Task.objects.all()
@@ -57,3 +58,43 @@ def task_delete(request, pk):
     tasks.delete()
     return Response("Task deleted")
 
+
+# views for people
+@api_view(['GET'])
+def person_list(request):
+    person = Person.objects.all()
+    serializer = PersonSerializer(person, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def person_detail(request, pk):
+    person = Person.objects.get(id=pk)
+    serializer = PersonSerializer(person, many=False)
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+def person_create(request):
+    serializer = PersonSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+def person_update(request, pk):
+    person = Person.objects.get(id=pk)
+    serializer = PersonSerializer(instance=person, data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+
+    return Response(serializer.data)
+
+
+@api_view(['DELETE'])
+def person_delete(request, pk):
+    person = Person.objects.get(id=pk)
+    person.delete()
+    return Response("Person deleted")

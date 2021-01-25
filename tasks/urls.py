@@ -9,4 +9,10 @@ urlpatterns = [
     path('task-create/', views.task_create, name="tasks_create"),
     path('task-update/<str:pk>/', views.task_update, name="tasks_update"),
     path('task-delete/<str:pk>/', views.task_delete, name="tasks_delete"),
+    # views for people
+    path('person-list/', views.person_list, name="person_list"),
+    path('person-details/<str:pk>/', views.person_detail, name="person_details"),
+    path('person-create/', views.person_create, name="person_create"),
+    path('person-update/<str:pk>/', views.person_update, name="person_update"),
+    path('person-delete/<str:pk>/', views.person_delete, name="person_delete"),
 ]
