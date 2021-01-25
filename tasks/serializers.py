@@ -9,8 +9,6 @@ class TaskSerializer(serializers.ModelSerializer):
 
 
 class PersonSerializer(serializers.ModelSerializer):
-    tasks = TaskSerializer(many=True, read_only=True)
-
     class Meta:
         model = Person
         fields = '__all__'

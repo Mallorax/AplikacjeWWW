@@ -5,19 +5,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.generics import ListAPIView
+from rest_framework.filters import SearchFilter, OrderingFilter
 from .serializers import TaskSerializer, PersonSerializer
-
-
-@api_view(['GET'])
-def api_overview(request):
-    api_urls = {
-        'List': 'tasks-list',
-        'Detail View': '/task-detail/<str:pk>',
-        'Create': '/task-create/',
-        'Update': '/task-update/<str:pk>',
-        'Delete': '/task-delete/<str:pk>',
-    }
-    return Response(api_urls)
 
 
 # views for tasks
@@ -25,6 +14,8 @@ class TasksListView(ListAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     pagination_class = PageNumberPagination
+    filter_backends = (SearchFilter, OrderingFilter)
+    search_fields = ('title', 'priority', 'person__last_name', 'person__first_name')
 
 
 @api_view(['GET'])
@@ -66,6 +57,8 @@ class PeopleListView(ListAPIView):
     queryset = Person.objects.all()
     serializer_class = PersonSerializer
     pagination_class = PageNumberPagination
+    filter_backends = (SearchFilter, OrderingFilter)
+    search_fields = ('last_name', 'first_name')
 
 
 @api_view(['GET'])
