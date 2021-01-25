@@ -3,6 +3,8 @@ from .models import Task, Person
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.generics import ListAPIView
 from .serializers import TaskSerializer, PersonSerializer
 
 
@@ -19,11 +21,10 @@ def api_overview(request):
 
 
 # views for tasks
-@api_view(['GET'])
-def tasks_list(request):
-    tasks = Task.objects.all()
-    serializer = TaskSerializer(tasks, many=True)
-    return Response(serializer.data)
+class TasksListView(ListAPIView):
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer
+    pagination_class = PageNumberPagination
 
 
 @api_view(['GET'])
@@ -60,11 +61,11 @@ def task_delete(request, pk):
 
 
 # views for people
-@api_view(['GET'])
-def person_list(request):
-    person = Person.objects.all()
-    serializer = PersonSerializer(person, many=True)
-    return Response(serializer.data)
+
+class PeopleListView(ListAPIView):
+    queryset = Person.objects.all()
+    serializer_class = PersonSerializer
+    pagination_class = PageNumberPagination
 
 
 @api_view(['GET'])
