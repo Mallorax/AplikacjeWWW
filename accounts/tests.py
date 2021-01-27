@@ -1,3 +1,4 @@
+from django.contrib.auth import authenticate
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.urls import reverse
@@ -10,11 +11,24 @@ import json
 
 
 class RegistrationTestCase(APITestCase):
-    def test_registration(self):
-        data = {"username": "test", "email": "test@test.com",
-                "password": "some_passwd"}
-        response = self.client.post(reverse("sign-up"), data)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    def setUp(self):
+        self.user = User.objects.create_user(username='test', password='12test12', email='test@example.com')
+        self.user.save()
+
+    def tearDown(self):
+        self.user.delete()
+
+    def test_correct(self):
+        user = authenticate(username='test', password='12test12')
+        self.assertTrue((user is not None) and user.is_authenticated)
+
+    def test_wrong_username(self):
+        user = authenticate(username='wrong', password='12test12')
+        self.assertFalse(user is not None and user.is_authenticated)
+
+    def test_wrong_pssword(self):
+        user = authenticate(username='test', password='wrong')
+        self.assertFalse(user is not None and user.is_authenticated)
 
 
 class PersonTestCase(APITestCase):
@@ -34,25 +48,18 @@ class PersonTestCase(APITestCase):
         self.assertNotEqual(old_count, new_count)
 
 
-class PersonViewTestCase(TestCase):
-    def setUp(self):
-        self.client = APIClient()
-        self.person_data = {"first_name": "Jan",
-                            "last_name": "Kowal",
-                            "tel_number": 583932023}
-        self.response = self.client.post(
-            reverse("person_create"),
-            self.person_data,
-            format="json"
-        )
+class PersonListViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        num_of_people = 15
+        for person_id in range(num_of_people):
+            Person.objects.create(
+                first_name=f'Janek{person_id}',
+                last_name=f'Kowal{person_id}',
+                tel_number=534566234 + person_id)
 
-    def test_api_can_create_person(self):
-        self.assertEqual(self.response.status_code, status.HTTP_201_CREATED)
-
-    def test_api_can_get_person_list(self):
-        person = Person.objects.get()
-        response = self.client.get(
-            reverse("person_details", kwargs={'pk': person.id}), format="json")
+    def test_view_url_exists_at_desired_location(self):
+        response = self.client.get(reverse('person_list'), follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertContains(response, person)
+
 
