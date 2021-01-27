@@ -49,14 +49,6 @@ class PersonTestCase(APITestCase):
 
 
 class PersonListViewTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        num_of_people = 15
-        for person_id in range(num_of_people):
-            Person.objects.create(
-                first_name=f'Janek{person_id}',
-                last_name=f'Kowal{person_id}',
-                tel_number=534566234 + person_id)
 
     def test_view_url_exists_at_desired_location(self):
         response = self.client.get(reverse('person_list'), follow=True)
