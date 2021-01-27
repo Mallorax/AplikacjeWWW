@@ -7,15 +7,15 @@ from .models import Task, Person
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.generics import ListAPIView
+from rest_framework import generics
 from rest_framework.filters import SearchFilter, OrderingFilter
 from .serializers import TaskSerializer, PersonSerializer
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth import mixins
 
 
 # views for tasks
-class TasksListView(PermissionRequiredMixin, ListAPIView):
+class TasksListView(mixins.PermissionRequiredMixin, generics.ListAPIView):
     permission_required = 'tasks.view_task'
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
@@ -32,7 +32,6 @@ class TasksListView(PermissionRequiredMixin, ListAPIView):
 @login_required
 @permission_required('tasks.view_task')
 def task_detail(request, pk):
-    username = None
     tasks = Task.objects.get(id=pk)
     serializer = TaskSerializer(tasks, many=False)
     return Response(serializer.data)
@@ -71,7 +70,7 @@ def task_delete(request, pk):
 
 
 # views for people
-class PeopleListView(PermissionRequiredMixin, ListAPIView):
+class PeopleListView(mixins.PermissionRequiredMixin, generics.ListAPIView):
     permission_required = 'tasks.view_person'
     queryset = Person.objects.all()
     serializer_class = PersonSerializer
